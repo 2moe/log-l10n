@@ -29,4 +29,4 @@ fn main() {
 }
 ```
 
-![preview](assets/img/preview.jpg)
+![preview](https://raw.githubusercontent.com/2moe/log-l10n/img/preview.png)
