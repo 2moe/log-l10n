@@ -1,5 +1,6 @@
-use crate::get_log_core_l10n;
-use glossa::assets::OnceCell;
+use glossa::{assets::OnceCell, GetText};
+
+use crate::assets::get_l10n_text;
 
 #[cfg(feature = "color")]
 pub mod color;
@@ -17,17 +18,41 @@ pub enum Lv {
     Trace,
 }
 
+pub(crate) fn get_log_core_l10n(key: &str) -> &str {
+    get_l10n_text()
+        .get("log-core", key)
+        .unwrap_or(key)
+}
+
+/// Converts a string log level to its corresponding usize representation.
+///
+/// # Example
+///
+/// ```
+/// use log_l10n::level::str_to_lv_usize;
+///
+/// let s = "DeBUG";
+/// let lv = str_to_lv_usize(s);
+/// assert_eq!(lv, 4);
+/// ```
+///
+/// For better efficiency, please use `["error", "warn", "info", "debug", "trace"]` instead of a mix of uppercase and lowercase letters.
 pub fn str_to_lv_usize(s: &str) -> usize {
+    // If the log level is found in the LV slice, return its index plus 1.
     if let Ok(s) = LV.binary_search(&s) {
         return s + 1;
     }
 
+    // Convert the input string to lowercase.
     let l = s.to_ascii_lowercase();
 
+    // Check the first four characters of the lowercase string.
+    // If the string only has three or fewer characters, return 0.
     let Some(lcase) = l.get(..4) else {
         return 0
     };
 
+    // Match the lowercase string with one of the log levels and return its corresponding usize value.
     match lcase {
         "erro" => 1,
         "warn" => 2,
@@ -38,6 +63,7 @@ pub fn str_to_lv_usize(s: &str) -> usize {
     }
 }
 
+/// It is similar to `get_l10n_level()`, but without the colored styling. See also: [color::get_l10n_level](crate::level::color::get_l10n_level)
 pub fn get_l10n_level_no_color<'a>(level: usize) -> &'a str {
     let lv = level.saturating_sub(1);
     unsafe { get_plain_level_arr().get_unchecked(lv) }

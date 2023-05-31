@@ -1,9 +1,23 @@
 use glossa::assets::OnceCell;
-use owo_colors::{OwoColorize, Style, Styled};
+pub use owo_colors::{OwoColorize, Style, Styled};
 
 use crate::level::get_plain_level_arr;
 
-/// Matches a log level with a corresponding string and style for formatting purposes.
+/// Gets the localized log level name with colored styles.
+///
+/// # Example
+///
+/// ```
+/// // let debug_lv = log::Level::Debug;
+/// // let s = get_l10n_level(debug_lv as usize);
+/// // dbg!(s);
+///
+/// use log_l10n::level::{color::get_l10n_level, Lv};
+///
+/// let w = Lv::Warn;
+/// let s = get_l10n_level(w as usize);
+/// println!("{s}")
+/// ```
 pub fn get_l10n_level<'z, 'y, 'x>(level: usize) -> &'z Styled<&'y &'x str> {
     let lv = level.saturating_sub(1);
     unsafe { get_styled_level_arr().get_unchecked(lv) }
@@ -67,5 +81,12 @@ mod tests {
 
         let e = str_to_lv_usize("erro");
         dbg!(e, get_l10n_level(e));
+    }
+
+    #[test]
+    fn log_l10n_lv() {
+        let w = crate::level::Lv::Warn;
+        let s = get_l10n_level(w as usize);
+        println!("{s}")
     }
 }
